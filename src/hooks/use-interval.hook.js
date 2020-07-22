@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-export default function useInterval(callback, delay) {
+function useInterval(callback, delay) {
   const savedCallback = React.useRef();
 
   // Remember the latest callback.
@@ -19,3 +19,34 @@ export default function useInterval(callback, delay) {
     }
   }, [delay]);
 }
+
+const useKeydown = (callback) => {
+  React.useEffect(() => {
+    window.addEventListener('keydown', callback)
+    return () => {
+      window.removeEventListener('keydown', callback)
+    }
+  })
+}
+
+const useDocumentTitle = (title, fallbackTitle) => {
+  React.useEffect(() => {
+    document.title = title;
+    return () => {
+      document.title = fallbackTitle
+    }
+  }, [title])
+}
+
+const usePersistedState = (value, name) => {
+  let getter = null;
+  if (typeof localStorage.getItem(name) === 'string') {
+  getter = localStorage.getItem(name).split(',').length > 1
+    ? localStorage.getItem(name).split(',').map(Number)
+    : parseInt(localStorage.getItem(name))
+  } else { getter = value }
+  
+    return useState(getter)
+}
+
+export { useInterval, useKeydown, useDocumentTitle, usePersistedState };
